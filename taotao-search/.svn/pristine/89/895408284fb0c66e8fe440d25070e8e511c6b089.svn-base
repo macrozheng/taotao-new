@@ -1,0 +1,5 @@
+rabbit.host=127.0.0.1
+rabbit.port=5672
+rabbit.username=taotao
+rabbit.passwd=taotao
+rabbit.vhost=/taotao

@@ -1,0 +1,16 @@
+package com.taotao.manage.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.taotao.manage.service.ItemDescService;
+
+@RequestMapping("item/desc")
+@Controller
+public class ItemDescController {
+
+    @Autowired
+    private ItemDescService itemDescService;
+
+}

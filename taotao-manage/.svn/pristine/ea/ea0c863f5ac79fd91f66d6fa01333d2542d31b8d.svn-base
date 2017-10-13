@@ -1,0 +1,104 @@
+package com.taotao.manage.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.taotao.common.bean.EasyUIResult;
+import com.taotao.manage.pojo.Item;
+import com.taotao.manage.service.ItemDescService;
+import com.taotao.manage.service.ItemService;
+
+@RequestMapping("item")
+@Controller
+public class ItemController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ItemDescService itemDescService;
+
+    /**
+     * 新增商品
+     * 
+     * @param item
+     * @param desc
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Void> saveItem(Item item, @RequestParam("desc") String desc,
+            @RequestParam("itemParams") String itemParams) {
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("新增商品，item = {}, desc = {}", item, desc);
+            }
+            Boolean bool = this.itemService.saveItem(item, desc, itemParams);
+            if (bool) {
+                // 新增成功 201
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("新增商品成功! itemId = {}", item.getId());
+                }
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("新增商品失败，但是没有异常抛出！ item = {}", item);
+            }
+        } catch (Exception e) {
+            LOGGER.error("新增商品失败! item  = " + item, e);
+        }
+        // 500
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    /**
+     * 查询商品数据列表
+     * 
+     * @param page
+     * @param rows
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<EasyUIResult> queryList(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "rows", defaultValue = "30") Integer rows) {
+        try {
+            return ResponseEntity.ok(this.itemService.queryPageList(page, rows));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // 500
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+
+    /**
+     * 更新商品
+     * 
+     * @param item
+     * @param desc
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseEntity<Void> updateItem(Item item, @RequestParam("desc") String desc,
+            @RequestParam("itemParams") String itemParams, @RequestParam("itemParamId") Long itemParamId) {
+        try {
+            Boolean bool = this.itemService.updateItem(item, desc, itemParamId, itemParams);
+            if (bool) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // 500
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+
+}
