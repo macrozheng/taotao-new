@@ -1,3 +1,0 @@
-redis.maxTotal=100
-redis.node1.host=127.0.0.1
-redis.node1.port=6379

@@ -1,3 +1,0 @@
-solr.maxRetries=1
-solr.connectionTimeout=1000
-solr.url=http://solr.taotao.com/taotao
