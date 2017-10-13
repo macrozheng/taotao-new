@@ -1,0 +1,50 @@
+package com.taotao.manage.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.github.abel533.entity.Example;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.taotao.common.bean.EasyUIResult;
+import com.taotao.manage.mapper.ItemMapper;
+import com.taotao.manage.pojo.Item;
+import com.taotao.manage.pojo.ItemDesc;
+
+@Service
+public class ItemService extends BaseService<Item> {
+
+    @Autowired
+    private ItemDescService itemDescService;
+
+    @Autowired
+    private ItemMapper itemMapper;
+
+    public Boolean saveItem(Item item, String desc) {
+        // 初始数据
+        item.setStatus(1);
+        item.setId(null);// 强制设置id为null，从数据库中自增长
+
+        Integer count1 = super.save(item);
+        ItemDesc itemDesc = new ItemDesc();
+        itemDesc.setItemId(item.getId());
+        itemDesc.setItemDesc(desc);
+
+        // 保存商品描述数据
+        Integer count2 = this.itemDescService.save(itemDesc);
+        return count1.intValue() == 1 && count2.intValue() == 1;
+    }
+
+    public EasyUIResult queryPageList(Integer page, Integer rows) {
+        //设置分页信息
+        PageHelper.startPage(page, rows);
+        Example example = new Example(Item.class);
+        example.setOrderByClause("created DESC");//设置排序信息
+        List<Item> items = this.itemMapper.selectByExample(example);
+        PageInfo<Item> pageInfo = new PageInfo<Item>(items);
+        return new EasyUIResult(pageInfo.getTotal(), pageInfo.getList());
+    }
+
+}
